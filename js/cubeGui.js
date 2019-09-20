@@ -2,6 +2,8 @@
 
 //scene
 const scene = new THREE.Scene();
+var axesHelper = new THREE.AxesHelper( 500 );
+scene.add( axesHelper );
 
 //renderer
 const renderer = new THREE.WebGLRenderer();
@@ -9,13 +11,21 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 //camera
-const fieldOfView = 75;
-const aspectRatio = window.innerWidth / window.innerHeight;
-const clipping = {
-    min: 0.5,
-    max: 500
-};
-const camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, clipping.min, clipping.max);
+let cameraOptions = {
+    fieldOfView:75,
+    aspectRatio: window.innerWidth / window.innerHeight,
+    clipping: {
+        min: 0.5,
+        max: 500
+    },
+}
+
+const camera = new THREE.PerspectiveCamera(
+    cameraOptions.fieldOfView, 
+    cameraOptions.aspectRatio, 
+    cameraOptions.clipping.min, 
+    cameraOptions.clipping.max
+);
 
 let cameraPosition = {
     x: 0,
@@ -28,7 +38,6 @@ let cameraPosition = {
     },
     lookAtCenter: false,
 };
-
 camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
 // light
@@ -42,10 +51,12 @@ let lightPosition = {
         this.z = 1;
     }
 };
-const light = new THREE.DirectionalLight(0xFFFFFF, 1);
-light.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
-scene.add(light);
+const lightDirectional = new THREE.DirectionalLight(0xFFFFFF, 1);
+lightDirectional.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
+// scene.add(lightDirectional);
 
+var lightAmbient = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( lightAmbient );
 
 // cube
 let cubeSize = {
@@ -59,22 +70,19 @@ let cubeSize = {
     }
 }
 
-let cubePosition = {
-    x: 0,
-    y: 0,
-    z: 0,
-    reset: function(){
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-    }
-}
 
 var geometry = new THREE.BoxGeometry(cubeSize.width, cubeSize.height, cubeSize.depth);
-for (var i = 0; i < geometry.faces.length; i += 2) {
-    let currentColor = Math.random() * 0xffffff;
-    geometry.faces[i].color.setHex(currentColor);
-    geometry.faces[i+1].color.setHex(currentColor);
+
+let facesColors = {};
+
+for (let i = 0; i < geometry.faces.length / 2; i ++){
+    let faceColor = Math.random() * 0xffffff;
+    facesColors[i] = faceColor;
+}
+
+for (var i = 0; i < geometry.faces.length/2; i ++) {
+    geometry.faces[i*2].color.setHex(facesColors[i]);
+    geometry.faces[i*2 +1].color.setHex(facesColors[i]);
 }
 
 var material = new THREE.MeshPhongMaterial({
@@ -85,7 +93,17 @@ var material = new THREE.MeshPhongMaterial({
 var cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-
+// cubePosition
+let cubePosition = {
+    x: 0,
+    y: 0,
+    z: 0,
+    reset: function(){
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
+}
 
 // rotationSpeed
 let rotationSpeed = {
@@ -99,15 +117,34 @@ let rotationSpeed = {
     }
 };
 
-// GUI
+renderer.render(scene, camera);
+
+
+
+
+
+
+
+
+// *******************************************************
+// 
+//                      ИНТЕРФЕЙС
+// 
+// *******************************************************
+
 let gui = new dat.GUI();
 
-let cameraOptions = gui.addFolder('camera position');
-cameraOptions.add(cameraPosition, 'x',-10,10,0.1);
-cameraOptions.add(cameraPosition, 'y',-10,10,0.1);
-cameraOptions.add(cameraPosition, 'z',-10,10,0.1);
-cameraOptions.add(cameraPosition, 'lookAtCenter');
-cameraOptions.add(cameraPosition, 'reset');
+let gui_camera = gui.addFolder('camera');
+
+let gui_cameraOptions = gui_camera.addFolder('options');
+gui_cameraOptions.add(cameraOptions, 'fieldOfView',1,179,1);
+
+let gui_cameraPosition = gui_camera.addFolder('position');
+gui_cameraPosition.add(cameraPosition, 'x',-10,10,0.1);
+gui_cameraPosition.add(cameraPosition, 'y',-10,10,0.1);
+gui_cameraPosition.add(cameraPosition, 'z',-10,10,0.1);
+gui_cameraPosition.add(cameraPosition, 'lookAtCenter');
+gui_cameraPosition.add(cameraPosition, 'reset');
 
 let gui_ligthPosition = gui.addFolder('light position');
 gui_ligthPosition.add(lightPosition, 'x', -10,10,0.1);
@@ -115,28 +152,39 @@ gui_ligthPosition.add(lightPosition, 'y', -10,10,0.1);
 gui_ligthPosition.add(lightPosition, 'z', -10,10,0.1);
 gui_ligthPosition.add(lightPosition, 'reset');
 
-let position = gui.addFolder('cubes position');
-position.add(cubePosition, 'x',-5,5,0.10);
-position.add(cubePosition, 'y',-5,5,0.10);
-position.add(cubePosition, 'z',-5,5,0.10);
-position.add(cubePosition, 'reset');
+let gui_cubePosition = gui.addFolder('cube position');
+gui_cubePosition.add(cubePosition, 'x',-5,5,0.10);
+gui_cubePosition.add(cubePosition, 'y',-5,5,0.10);
+gui_cubePosition.add(cubePosition, 'z',-5,5,0.10);
+gui_cubePosition.add(cubePosition, 'reset');
 
-let size = gui.addFolder('cube size');
-size.add(cubeSize, 'width').min(1).max(5).step(0.1);
-size.add(cubeSize, 'height').min(1).max(5).step(0.1);
-size.add(cubeSize, 'depth').min(1).max(5).step(0.1);
-size.add(cubeSize, 'normalize');
+let gui_cubeSize = gui.addFolder('cube size');
+gui_cubeSize.add(cubeSize, 'width').min(1).max(5).step(0.1);
+gui_cubeSize.add(cubeSize, 'height').min(1).max(5).step(0.1);
+gui_cubeSize.add(cubeSize, 'depth').min(1).max(5).step(0.1);
+gui_cubeSize.add(cubeSize, 'normalize');
 
-let rotation = gui.addFolder('rotation speed');
-rotation.add(rotationSpeed, 'rotationSpeed_x').min(-10).max(10).step(1);
-rotation.add(rotationSpeed, 'rotationSpeed_y').min(-10).max(10).step(1);
-rotation.add(rotationSpeed, 'rotationSpeed_z').min(-10).max(10).step(1);
-rotation.add(rotationSpeed,'stop');
+let gui_rotationSpeed = gui.addFolder('rotation speed');
+gui_rotationSpeed.add(rotationSpeed, 'rotationSpeed_x').min(-10).max(10).step(1);
+gui_rotationSpeed.add(rotationSpeed, 'rotationSpeed_y').min(-10).max(10).step(1);
+gui_rotationSpeed.add(rotationSpeed, 'rotationSpeed_z').min(-10).max(10).step(1);
+gui_rotationSpeed.add(rotationSpeed,'stop');
 
-var axesHelper = new THREE.AxesHelper( 500 );
-scene.add( axesHelper );
+let gui_facesColors = gui.addFolder('faces colors');
+for( let key in facesColors){
+    gui_facesColors.addColor(facesColors, `${key}`);
+}
 
-renderer.render(scene, camera);
+console.log(geometry.faces);
+
+
+
+
+// *******************************************************
+// 
+//                    ЦИКЛ АНИМАЦИИ
+// 
+// *******************************************************
 
 var animate = function () {
     requestAnimationFrame(animate);
@@ -146,7 +194,10 @@ var animate = function () {
         camera.lookAt(0,0,0);
     }
 
-    light.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
+    camera.fov = cameraOptions.fieldOfView;
+    camera.updateProjectionMatrix();
+
+    lightDirectional.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
 
     cube.position.set(cubePosition.x,cubePosition.y,cubePosition.z);
 
@@ -158,6 +209,13 @@ var animate = function () {
     cube.rotation.y += rotationSpeed.rotationSpeed_y / 500;
     cube.rotation.z += rotationSpeed.rotationSpeed_z / 500;
     renderer.render(scene, camera);
+    geometry.colorsNeedUpdate = true;
+
+    for (var i = 0; i < geometry.faces.length/2; i ++) {
+        geometry.faces[i*2].color.setHex(facesColors[i]);
+        geometry.faces[i*2 +1].color.setHex(facesColors[i]);
+    }
+
 };
 
 animate();
