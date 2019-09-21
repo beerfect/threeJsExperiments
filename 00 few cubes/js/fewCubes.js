@@ -45,23 +45,8 @@ for (let i = 0; i < cubes.length; i++) {
 	};
 }
 
-let test = {
-	first: 0,
-	second: 0,
-}
-let gui = new dat.GUI();
-gui.add(test, 'first').min(-100).max(100).step(1);
-
 var animate = function () {
 	requestAnimationFrame( animate );
-
-	// cubes.forEach(cube => {
-	// 	cube.rotation.x += 0.01;
-	// 	cube.rotation.y += 0.01;
-	// 	cube.rotation.z += 0.01;
-	// });
-
-	// cubes[0].rotation.x += 0.01;
 
 	for (let i = 0; i < cubes.length; i++) {
 		cubes[i].rotation.x += cubesRotations[i].x;

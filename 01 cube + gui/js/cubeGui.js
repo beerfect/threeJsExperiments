@@ -2,7 +2,7 @@
 
 //scene
 const scene = new THREE.Scene();
-var axesHelper = new THREE.AxesHelper( 500 );
+const axesHelper = new THREE.AxesHelper( 500 );
 scene.add( axesHelper );
 
 //renderer
@@ -28,35 +28,34 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 let cameraPosition = {
-    x: 0,
-    y: 0,
-    z: 5,
+    x: 2,
+    y: 2,
+    z: 2,
     reset: function(){
-        this.x = 0;
-        this.y = 0;
-        this.z = 5;
+        this.x = 2;
+        this.y = 2;
+        this.z = 2;
     },
-    lookAtCenter: false,
+    lookAtCenter: true,
 };
 camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
 // light
 let lightPosition = {
-    x: 1,
-    y: 1,
-    z: 1,
+    x: 2,
+    y: 2,
+    z: 2,
     reset: function(){
-        this.x = 1;
-        this.y = 1;
-        this.z = 1;
+        this.x = 2;
+        this.y = 2;
+        this.z = 2;
     }
 };
 const lightDirectional = new THREE.DirectionalLight(0xFFFFFF, 1);
 lightDirectional.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
-// scene.add(lightDirectional);
+scene.add(lightDirectional);
 
-var lightAmbient = new THREE.AmbientLight( 0x404040 ); // soft white light
-scene.add( lightAmbient );
+
 
 // cube
 let cubeSize = {
@@ -136,15 +135,15 @@ let gui = new dat.GUI();
 
 let gui_camera = gui.addFolder('camera');
 
-let gui_cameraOptions = gui_camera.addFolder('options');
-gui_cameraOptions.add(cameraOptions, 'fieldOfView',1,179,1);
+// let gui_cameraOptions = gui_camera.addFolder('options');
+gui_camera.add(cameraOptions, 'fieldOfView',1,179,1);
 
-let gui_cameraPosition = gui_camera.addFolder('position');
-gui_cameraPosition.add(cameraPosition, 'x',-10,10,0.1);
-gui_cameraPosition.add(cameraPosition, 'y',-10,10,0.1);
-gui_cameraPosition.add(cameraPosition, 'z',-10,10,0.1);
-gui_cameraPosition.add(cameraPosition, 'lookAtCenter');
-gui_cameraPosition.add(cameraPosition, 'reset');
+// let gui_cameraPosition = gui_camera.addFolder('position');
+gui_camera.add(cameraPosition, 'x',-10,10,0.1);
+gui_camera.add(cameraPosition, 'y',-10,10,0.1);
+gui_camera.add(cameraPosition, 'z',-10,10,0.1);
+gui_camera.add(cameraPosition, 'lookAtCenter');
+gui_camera.add(cameraPosition, 'reset');
 
 let gui_ligthPosition = gui.addFolder('light position');
 gui_ligthPosition.add(lightPosition, 'x', -10,10,0.1);
