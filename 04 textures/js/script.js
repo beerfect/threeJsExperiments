@@ -71,12 +71,12 @@ function main() {
 	// cube C (6 local textures)
 	const geometryC = new THREE.BoxGeometry(1,1,1);
 	const materialC = [
-		new THREE.MeshBasicMaterial({map: loader.load('../textures/1.jpg')}),
-		new THREE.MeshBasicMaterial({map: loader.load('../textures/2.jpg')}),
-		new THREE.MeshBasicMaterial({map: loader.load('../textures/3.jpg')}),
-		new THREE.MeshBasicMaterial({map: loader.load('../textures/4.jpg')}),
-		new THREE.MeshBasicMaterial({map: loader.load('../textures/5.jpg')}),
-		new THREE.MeshBasicMaterial({map: loader.load('../textures/6.jpg')}),
+		new THREE.MeshPhongMaterial({map: loader.load('../textures/1.jpg')}),
+		new THREE.MeshPhongMaterial({map: loader.load('../textures/2.jpg')}),
+		new THREE.MeshPhongMaterial({map: loader.load('../textures/3.jpg')}),
+		new THREE.MeshPhongMaterial({map: loader.load('../textures/4.jpg')}),
+		new THREE.MeshPhongMaterial({map: loader.load('../textures/5.jpg')}),
+		new THREE.MeshPhongMaterial({map: loader.load('../textures/6.jpg')}),
 	];
 	const cubeC = new THREE.Mesh(geometryC,materialC);
 	cubeC.position.set(2,0,0);
